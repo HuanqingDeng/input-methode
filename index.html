@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>表单验证</title>
+</head>
+
+<body>
+    <form action="http:??xxx.com/register" method="POST" id="registerForm">
+        <div class="field" >
+            请输入用户名：
+            <input type="text" name="username">
+        </div>
+        <div class="field">
+            请输入密码：
+            <input type="password" name="password">
+        </div>
+        <div class="field">
+            请输入手机号：
+            <input type="tel" name="phoneNumber">
+        </div>
+        <button>提交</button>
+    </form>
+    <script src="validator.js"></script>
+    <script>
+        const registerForm = document.getElementById('registerForm');
+        registerForm.onsubmit = function () {
+            // const user=strategies.isNonEmpty(registerForm.username.value,'用户名不能为空');
+            // if(!user.status){
+            //     alert(user.msg);
+            //     return false
+            // }
+            // const passwd=strategies.minLength(registerForm.password.value,6,'长度必须大于六位');
+            // if(!passwd.status){
+            //     alert(passwd.msg);
+            //     return false
+            // }
+            // const phnoe=strategies.isNonEmpty(registerForm.phoneNumber.value,'手机号不能为空');
+            // if(!phnoe.status){
+            //     alert(phnoe.msg);
+            //     return false
+            // }
+            // const phnoes=strategies.isMobilePhone(registerForm.phoneNumber.value,'格式有误');
+            // if(!phnoes.status){
+            //     alert(phnoes.msg);
+            //     return false
+            // }
+            var errorMsg=validateFunc();
+            if(errorMsg){
+                alert(errorMsg);
+                return false
+            }
+            return true;
+        }
+        function validateFunc(){
+            // 抽象 验证对象
+            // 验证函数任务中已经有了验证策略类，有很多不确定的数量单位及规则要去验证
+            // 中介模式 要一个验证对象，专业的，将要验证的元素交给他一一验证，验证的过程抽象掉
+            // 如何给的过程，将验证的元素给对象
+            var validator = new Validator();
+            validator.add(registerForm.username,'isNonEmpty','用户名不能为空');
+            validator.add(registerForm.password,'minLength:6','长度必须大于六位');
+            validator.add(registerForm.phoneNumber,'isMobilePhone','格式有误');
+            var errorMsg=validator.start();
+            return errorMsg;
+            // const user=strategies.isNonEmpty(registerForm.username.value,'用户名不能为空');
+            // if(user){
+            //     return user;
+            // }
+            // const passwd=strategies.minLength(registerForm.password.value,6,'长度必须大于六位');
+            // if(passwd){
+            //     return passwd;
+            // } 
+            // const phnoes=strategies.isMobilePhone(registerForm.phoneNumber.value,'格式有误');
+            // if(phnoes){
+            //     return phnoes;
+            // }
+        }
+function Validator(){
+// 将要验证的表单元素加紧一个数组
+// 开启一一验证 strategies
+this.cache=[];
+}
+Validator.prototype={
+    add:function(dom,rule,errorMsg){
+        var ary=rule.split(':');
+        this.cache.push(function(){
+            var strategy=ary.shift();
+            ary.unshift(dom.value);
+            ary.push(errorMsg);
+            return strategies[strategy].apply(dom,ary)
+        })
+    },
+    start:function(){
+        for(var i=0,validateFunc;validateFunc=this.cache[i++];){
+            var msg=validateFunc();
+            if(msg){
+                return mag;
+            }
+        }
+    }
+}
+    </script>
+</body>
+
+</html>
